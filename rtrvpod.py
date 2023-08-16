@@ -3,7 +3,6 @@
 from xml.dom import minidom
 from datetime import datetime
 import subprocess
-from subprocess import DEVNULL
 
 xmlsrcfile = input("Enter the RSS feed's page address: ")
 if not bool(xmlsrcfile):
@@ -16,11 +15,15 @@ subprocess.run(['wget', xmlsrcfile, '-O', xmldestfile])  # get the RSS XML file
 rss_dom = minidom.parse(xmldestfile)  # Use minidom to read the XML file into memory
 xml_items = rss_dom.getElementsByTagName('item')  # all the episode info is under <item> tags
 
+replace_dict = {
+    '/' : '\u2215'
+}
+
 n = len(xml_items)
 for item in xml_items:  # loop through all <item>s
     # Grab the episode title, replace any slashes '/' with
     # U+2215 because OSes don't like '/' in file names.
-    title = item.getElementsByTagName('title')[0].firstChild.nodeValue.replace("/", "\u2215")
+    title = item.getElementsByTagName('title')[0].firstChild.nodeValue.translate(str.maketrans(replace_dict))
     # Grab the publication date, and trim off the timezone.
     pubDate = item.getElementsByTagName('pubDate')[0].firstChild.nodeValue.rsplit(' ', 1)[0]
     # And most importatly, grab the audio file.
