@@ -3,10 +3,13 @@
 from xml.dom import minidom
 from datetime import datetime
 import subprocess
+import sys
+
+allargs = ' '.join(sys.argv[1:])  # combine command-line arguments into a string
 
 xmlsrcfile = input("Enter the RSS feed's page address: ")
 if not bool(xmlsrcfile):
-    xmlsrcfile = "planetjarre.podigee.io/feed/mp3"  # default RSS file if none is given
+    xmlsrcfile = 'planetjarre.podigee.io/feed/mp3'  # default RSS file if none is given
     print("***\n*** No value entered, using " + xmlsrcfile + "\n***")
 
 xmldestfile = 'rss.xml'  # target file for RSS XML
@@ -27,7 +30,7 @@ for item in xml_items:  # loop through all <item>s
     # Grab the publication date, and trim off the timezone.
     pubDate = item.getElementsByTagName('pubDate')[0].firstChild.nodeValue.rsplit(' ', 1)[0]
     # And most importatly, grab the audio file.
-    audio = item.getElementsByTagName('enclosure')[0].getAttribute("url")
+    audio = item.getElementsByTagName('enclosure')[0].getAttribute('url')
     # Get the file extension.
     fileExt = audio.rsplit('.', 1)[1][:3]
     # Read the time into a time object.
@@ -37,4 +40,4 @@ for item in xml_items:  # loop through all <item>s
     # Keep count of the number of the episode, starting at the most recent.
     n -= 1
     # Download the episode, renaming it in the process.
-    subprocess.run(['wget', audio, '-O', filename])
+    subprocess.run(['wget', *allargs.split(), audio, '-O', filename])
