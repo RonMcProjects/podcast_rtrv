@@ -18,14 +18,15 @@ subprocess.run(['wget', xmlsrcfile, '-O', xmldestfile])  # get the RSS XML file
 rss_dom = minidom.parse(xmldestfile)  # Use minidom to read the XML file into memory
 xml_items = rss_dom.getElementsByTagName('item')  # all the episode info is under <item> tags
 
+# Characters that need to be replaced in filenames, this list is extendible.
 replace_dict = {
     '/' : '\u2215'
 }
 
 n = len(xml_items)
 for item in xml_items:  # loop through all <item>s
-    # Grab the episode title, replace any slashes '/' with
-    # U+2215 because OSes don't like '/' in file names.
+    # Retrieve the episode title.  Replace any invalid character with its alternative from
+    # the translation table, e.g. '/' to U+2215 because OSes don't like '/' in filenames.
     title = item.getElementsByTagName('title')[0].firstChild.nodeValue.translate(str.maketrans(replace_dict))
     # Grab the publication date, and trim off the timezone.
     pubDate = item.getElementsByTagName('pubDate')[0].firstChild.nodeValue.rsplit(' ', 1)[0]
@@ -36,7 +37,7 @@ for item in xml_items:  # loop through all <item>s
     # Read the time into a time object.
     dt = datetime.strptime(pubDate, '%a, %d %b %Y %H:%M:%S')
     # Create the file name which is: episode number. episode name - YYYY-MM-DD.ext
-    filename = str(n).zfill(4) + ". " + title+ " - " + dt.strftime("%Y-%m-%d") + "." + fileExt
+    filename = str(n).zfill(4) + ". " + title + " - " + dt.strftime("%Y-%m-%d") + "." + fileExt
     # Keep count of the number of the episode, starting at the most recent.
     n -= 1
     # Download the episode, renaming it in the process.
