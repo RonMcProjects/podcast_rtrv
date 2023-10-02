@@ -31,9 +31,12 @@ for item in xml_items:  # loop through all <item>s
     # Grab the publication date, and trim off the timezone.
     pubDate = item.getElementsByTagName('pubDate')[0].firstChild.nodeValue.rsplit(' ', 1)[0]
     # And most importatly, grab the audio file.
-    audio = item.getElementsByTagName('enclosure')[0].getAttribute('url')
+    enclosure = item.getElementsByTagName('enclosure')[0].getAttribute('url')
     # Get the file extension.
-    fileExt = audio.rsplit('.', 1)[1][:3]
+    # - Start by removing any separator (all after a ?)
+    audio = enclosure.rsplit('?')[0]
+    # - get the extension
+    fileExt = audio.rsplit('.', 1)[1]
     # Read the time into a time object.
     dt = datetime.strptime(pubDate, '%a, %d %b %Y %H:%M:%S')
     # Create the file name which is: episode number. episode name - YYYY-MM-DD.ext
