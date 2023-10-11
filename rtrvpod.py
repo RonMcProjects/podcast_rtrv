@@ -29,7 +29,10 @@ for item in xml_items:  # loop through all <item>s
     # the translation table, e.g. '/' to U+2215 because OSes don't like '/' in filenames.
     title = item.getElementsByTagName('title')[0].firstChild.nodeValue.translate(str.maketrans(replace_dict))
     # Grab the publication date, and trim off the timezone.
-    pubDate = item.getElementsByTagName('pubDate')[0].firstChild.nodeValue.rsplit(' ', 1)[0]
+    try:
+        pubDate = item.getElementsByTagName('pubDate')[0].firstChild.nodeValue.rsplit(' ', 1)[0]
+    except:
+        pubDate = "Wed, 31 Dec 1969 00:00:00" # in case none is supplied
     # And most importatly, grab the audio file.
     enclosure = item.getElementsByTagName('enclosure')[0].getAttribute('url')
     # Get the file extension.
