@@ -18,9 +18,10 @@ subprocess.run(['wget', xmlsrcfile, '-O', xmldestfile])  # get the RSS XML file
 rss_dom = minidom.parse(xmldestfile)  # Use minidom to read the XML file into memory
 xml_items = rss_dom.getElementsByTagName('item')  # all the episode info is under <item> tags
 
-# Characters that need to be replaced in filenames, this list is extendible.
+# Characters that need to be replaced in filenames, this list is extendable.
 replace_dict = {
-    '/' : '\u2215'
+    '/' : '\u2215',
+    '\n' : ''
 }
 
 n = len(xml_items)
@@ -32,9 +33,13 @@ for item in xml_items:  # loop through all <item>s
     try:
         pubDate = item.getElementsByTagName('pubDate')[0].firstChild.nodeValue.rsplit(' ', 1)[0]
     except:
-        pubDate = "Wed, 31 Dec 1969 00:00:00" # in case none is supplied
+        pubDate = "Thu, 01 Jan 1970 00:00:00" # use Epoch in case no date is supplied
     # And most importatly, grab the audio file.
-    enclosure = item.getElementsByTagName('enclosure')[0].getAttribute('url')
+    try:
+        enclosure = item.getElementsByTagName('enclosure')[0].getAttribute('url')
+    except:  # If there's no file for the <item> in question, move on.
+        n -= 1
+        continue
     # Get the file extension.
     # - Start by removing any separator (all after a ?)
     audio = enclosure.rsplit('?')[0]
