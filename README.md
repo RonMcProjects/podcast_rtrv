@@ -7,7 +7,7 @@ The utility will name the files according to the metadata's **title** and **pubD
 It numbers them from the oldest to the newest.
 
 This has been tested on Linux, Cygwin and MacOS.
-It requires *python3* and *wget*.
+It requires *python3*, *touch*, and *wget*.
 
 e.g. To download the Mandolin Minute podcast
 ```bash

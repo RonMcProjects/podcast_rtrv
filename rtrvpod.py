@@ -14,6 +14,7 @@ if not bool(xmlsrcfile):
 
 xmldestfile = 'rss.xml'  # target file for RSS XML
 subprocess.run(['wget', xmlsrcfile, '-O', xmldestfile])  # get the RSS XML file
+default_enclosurename = "rtrvpod_NONAME.txt"
 
 rss_dom = minidom.parse(xmldestfile)  # Use minidom to read the XML file into memory
 xml_items = rss_dom.getElementsByTagName('item')  # all the episode info is under <item> tags
@@ -33,13 +34,12 @@ for item in xml_items:  # loop through all <item>s
     try:
         pubDate = item.getElementsByTagName('pubDate')[0].firstChild.nodeValue.rsplit(' ', 1)[0]
     except:
-        pubDate = "Thu, 01 Jan 1970 00:00:00" # use Epoch in case no date is supplied
+        pubDate = "Thu, 01 Jan 1970 00:00:00"  # Use Epoch in case no date is supplied.
     # And most importatly, grab the audio file.
     try:
         enclosure = item.getElementsByTagName('enclosure')[0].getAttribute('url')
-    except:  # If there's no file for the <item> in question, move on.
-        n -= 1
-        continue
+    except:
+        enclosure = default_enclosurename  # In case there's no attachment for the <item>.
     # Get the file extension.
     # - Start by removing any separator (all after a ?)
     audio = enclosure.rsplit('?')[0]
@@ -51,5 +51,9 @@ for item in xml_items:  # loop through all <item>s
     filename = str(n).zfill(4) + ". " + title + " - " + dt.strftime("%Y-%m-%d") + "." + fileExt
     # Keep count of the number of the episode, starting at the most recent.
     n -= 1
-    # Download the episode, renaming it in the process.
-    subprocess.run(['wget', *allargs.split(), audio, '-O', filename])
+    if enclosure != default_enclosurename:
+        # Download the episode, renaming it in the process.
+        subprocess.run(['wget', *allargs.split(), audio, '-O', filename])
+    else:
+        # In case of no attachment, create an empty filename.
+        subprocess.run(['touch', filename])
