@@ -53,7 +53,7 @@ for item in xml_items:  # loop through all <item>s
     n -= 1
     if enclosure != default_enclosurename:
         # Download the episode, renaming it in the process.
-        subprocess.run(['wget', *allargs.split(), audio, '-O', filename])
+        subprocess.run(['wget', *allargs.split(), enclosure, '-O', filename])
     else:
         # In case of no attachment, create an empty filename.
-        subprocess.run(['touch', filename])
+        subprocess.run(['touch', "-t", dt.strftime("%y%m%d%H%M"), filename])
