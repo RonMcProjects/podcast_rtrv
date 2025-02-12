@@ -25,6 +25,14 @@ replace_dict = {
     '\n' : ''
 }
 
+dry_run=False
+# If the argument --dry-run is passed, set up a variable to skip downloads.
+for i in allargs.split():
+    if (i == '--dry-run') or (i == '-dry-run'):
+        print("** Doing a dry run, no episode downloads performed. **")
+        dry_run=True
+        break
+
 n = len(xml_items)
 for item in xml_items:  # loop through all <item>s
     # Retrieve the episode title.  Replace any invalid character with its alternative from
@@ -51,9 +59,9 @@ for item in xml_items:  # loop through all <item>s
     filename = str(n).zfill(4) + ". " + title + " - " + dt.strftime("%Y-%m-%d") + "." + fileExt
     # Keep count of the number of the episode, starting at the most recent.
     n -= 1
-    if enclosure != default_enclosurename:
+    if (enclosure != default_enclosurename) and (not dry_run):
         # Download the episode, renaming it in the process.
         subprocess.run(['wget', *allargs.split(), enclosure, '-O', filename])
     else:
-        # In case of no attachment, create an empty filename.
+        # In case of no attachment or doing a dry-run, create an empty filename.
         subprocess.run(['touch', "-t", dt.strftime("%y%m%d%H%M"), filename])

@@ -14,11 +14,15 @@ e.g. To download the Mandolin Minute podcast
 ./rtrvpod.py
 Enter the RSS feed's page address: https://anchor.fm/s/110b41c/podcast/rss
 ```
-Any command-line arguments get passed directly to *wget*. For example with
+You can do a dry run that won't download any files with the option --dry-run
 ```bash
-./rtrvpod.py --spider -nv
+./rtrvpod.py --dry-run
 ```
-the argument ```--spider``` tells *wget* to run without downloading any files, and ```-nv```
+Any other command-line arguments get passed directly to *wget*. For example with
+```bash
+./rtrvpod.py --no-clobber -nv
+```
+the argument ```--no-clobber``` tells *wget* to run without overwriting any files, and ```-nv```
 tells *wget* to run in non-verbose mode.
 
 The podcast files will end up in the current working directory, along with the file rss.xml
