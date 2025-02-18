@@ -5,7 +5,7 @@ from datetime import datetime
 import subprocess
 import sys
 
-allargs = ' '.join(sys.argv[1:])  # combine command-line arguments into a string
+allargs = ""
 
 xmlsrcfile = input("Enter the RSS feed's page address: ")
 if not bool(xmlsrcfile):
@@ -25,15 +25,20 @@ replace_dict = {
     '\n' : ''
 }
 
-dry_run=False
-# If the argument --dry-run is passed, set up a variable to skip downloads.
-for i in allargs.split():
-    if (i == '--dry-run') or (i == '-dry-run'):
+dry_run = False
+indexSubtract = 0
+# Parse arguments.
+for i in range(1, len(sys.argv)):
+    if (sys.argv[i] == '--dry-run') or (sys.argv[i] == '-dry-run'):
         print("** Doing a dry run, no episode downloads performed. **")
         dry_run=True
-        break
+    elif (sys.argv[i] == '--zero') or (sys.argv[i] == '-zero') or (sys.argv[i] == '-z'):
+        print("\u2020\u2020 Starting episode numbering at ZERO \u2020\u2020")
+        indexSubtract = 1
+    else: # accumulate the remaining arguments for passing to wget
+        allargs += sys.argv[i] + " "
 
-n = len(xml_items)
+n = len(xml_items) - indexSubtract
 for item in xml_items:  # loop through all <item>s
     # Retrieve the episode title.  Replace any invalid character with its alternative from
     # the translation table, e.g. '/' to U+2215 because OSes don't like '/' in filenames.
@@ -51,7 +56,7 @@ for item in xml_items:  # loop through all <item>s
     # Get the file extension.
     # - Start by removing any separator (all after a ?)
     audio = enclosure.rsplit('?')[0]
-    # - get the extension
+    # - get the file extension
     fileExt = audio.rsplit('.', 1)[1]
     # Read the time into a time object.
     dt = datetime.strptime(pubDate, '%a, %d %b %Y %H:%M:%S')

@@ -18,6 +18,10 @@ You can do a dry run that won't download any files with the option --dry-run
 ```bash
 ./rtrvpod.py --dry-run
 ```
+You can tell the program to start numbering episodes at zero, used for example if there's a trailer episode.  Otherwise numbering starts at 1.
+```bash
+./rtrvpod.py --zero
+```
 Any other command-line arguments get passed directly to *wget*. For example with
 ```bash
 ./rtrvpod.py --no-clobber -nv
