@@ -29,8 +29,8 @@ Any other command-line arguments get passed directly to *wget*. For example with
 the argument ```--no-clobber``` tells *wget* to run without overwriting any files, and ```-nv```
 tells *wget* to run in non-verbose mode.
 
-The podcast files will end up in the current working directory, along with the file rss.xml
-which contains the metadata for the podcast.
+The podcast files will end up in the current working directory, along with the file ```rss.xml``` which contains the metadata for the podcast.
+The feed URL that was provided will be written to a file ```feedURL.txt``` for future reference.
 
 If no path is provided (i.e. the user presses ENTER without providing a web link to an RSS),
 then a default podcast ```planetjarre.podigee.io/feed/mp3``` is downloaded.

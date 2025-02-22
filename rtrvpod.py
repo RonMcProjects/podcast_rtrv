@@ -70,3 +70,6 @@ for item in xml_items:  # loop through all <item>s
     else:
         # In case of no attachment or doing a dry-run, create an empty filename.
         subprocess.run(['touch', "-t", dt.strftime("%y%m%d%H%M"), filename])
+    # Write the xml feed URL to a file
+    with open("feedURL.txt", "w") as feedfile:
+        feedfile.write(xmlsrcfile + "\n")
