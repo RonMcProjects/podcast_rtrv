@@ -34,14 +34,15 @@ for i in range(1, len(sys.argv)):
 
 # If the caller requested a formatted xml file, make one and exit
 if formatxml:
-    from lxml import etree
     try:
-        x = etree.parse(xmldestfile)
+        xmldata = minidom.parse(xmldestfile)
     except:
         print(f"ERROR: Can't parse {xmldestfile}")
         exit(1)
     with open(formatted_rssxml, "w") as file:
-        formattedxml = etree.tostring(x, pretty_print=True, encoding=str)
+        formattedxml = xmldata.toprettyxml()  # prettify xml
+        formattedxml = '\n'.join([s for s in formattedxml.splitlines() 
+                                  if s.strip()]) # remove double spacing
         file.write(formattedxml)
         exit(0)
 
