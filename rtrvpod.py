@@ -5,38 +5,55 @@ from datetime import datetime
 import subprocess
 import sys
 
+# Initialize variables
 allargs = ""
+dry_run = False
+indexSubtract = 0
+formatxml = False
+xmldestfile = 'rss.xml'  # target file for RSS XML
+formatted_rssxml = 'formatted_rss.xml'
+default_enclosurename = "rtrvpod_NONAME.txt"
+replace_dict = {  # Characters to replace in filenames, this list is extendable.
+    '/' : '\u2215',
+    '\n' : ''
+}
+
+# Parse arguments.
+for i in range(1, len(sys.argv)):
+    if (sys.argv[i] == '--dry-run') or (sys.argv[i] == '-dry-run'):
+        print("** Doing a dry run, no episode downloads performed. **")
+        dry_run = True
+    elif (sys.argv[i] == '--zero') or (sys.argv[i] == '-zero') or (sys.argv[i] == '-z'):
+        print("\u2020\u2020 Starting episode numbering at ZERO \u2020\u2020")
+        indexSubtract = 1
+    elif (sys.argv[i] == '--formatxml') or (sys.argv[i] == '-formatxml'):
+        print(f"\u2021\u2021 Output file '{formatted_rssxml}' will be written \u2021\u2021")
+        formatxml = True
+    else: # accumulate the remaining arguments for passing to wget
+        allargs += sys.argv[i] + " "
+
+# If the caller requested a formatted xml file, make one and exit
+if formatxml:
+    from lxml import etree
+    try:
+        x = etree.parse(xmldestfile)
+    except:
+        print(f"ERROR: Can't parse {xmldestfile}")
+        exit(1)
+    with open(formatted_rssxml, "w") as file:
+        formattedxml = etree.tostring(x, pretty_print=True, encoding=str)
+        file.write(formattedxml)
+        exit(0)
 
 xmlsrcfile = input("Enter the RSS feed's page address: ")
 if not bool(xmlsrcfile):
     xmlsrcfile = 'planetjarre.podigee.io/feed/mp3'  # default RSS file if none is given
     print("***\n*** No value entered, using " + xmlsrcfile + "\n***")
 
-xmldestfile = 'rss.xml'  # target file for RSS XML
 subprocess.run(['wget', xmlsrcfile, '-O', xmldestfile])  # get the RSS XML file
-default_enclosurename = "rtrvpod_NONAME.txt"
 
 rss_dom = minidom.parse(xmldestfile)  # Use minidom to read the XML file into memory
 xml_items = rss_dom.getElementsByTagName('item')  # all the episode info is under <item> tags
-
-# Characters that need to be replaced in filenames, this list is extendable.
-replace_dict = {
-    '/' : '\u2215',
-    '\n' : ''
-}
-
-dry_run = False
-indexSubtract = 0
-# Parse arguments.
-for i in range(1, len(sys.argv)):
-    if (sys.argv[i] == '--dry-run') or (sys.argv[i] == '-dry-run'):
-        print("** Doing a dry run, no episode downloads performed. **")
-        dry_run=True
-    elif (sys.argv[i] == '--zero') or (sys.argv[i] == '-zero') or (sys.argv[i] == '-z'):
-        print("\u2020\u2020 Starting episode numbering at ZERO \u2020\u2020")
-        indexSubtract = 1
-    else: # accumulate the remaining arguments for passing to wget
-        allargs += sys.argv[i] + " "
 
 n = len(xml_items) - indexSubtract
 for item in xml_items:  # loop through all <item>s

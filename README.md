@@ -14,7 +14,7 @@ e.g. To download the Mandolin Minute podcast
 ./rtrvpod.py
 Enter the RSS feed's page address: https://anchor.fm/s/110b41c/podcast/rss
 ```
-You can do a dry run that won't download any files with the option --dry-run
+You can do a dry run that won't download any files with the option ```--dry-run```
 ```bash
 ./rtrvpod.py --dry-run
 ```
@@ -32,5 +32,9 @@ tells *wget* to run in non-verbose mode.
 The podcast files will end up in the current working directory, along with the file ```rss.xml``` which contains the metadata for the podcast.
 The feed URL that was provided will be written to a file ```feedURL.txt``` for future reference.
 
+Sometimes the downloaded rss.xml file has no line breaks.  You can use rtrvpod to create a human-readable file ```formatted_rss.xml```.  If used, this option exits without downloading anything and ignores other parameters.
+```bash
+./rtrvpod.py --formatxml
+```
 If no path is provided (i.e. the user presses ENTER without providing a web link to an RSS),
 then a default podcast ```planetjarre.podigee.io/feed/mp3``` is downloaded.
