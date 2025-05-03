@@ -41,8 +41,10 @@ if formatxml:
         exit(1)
     with open(formatted_rssxml, "w") as file:
         formattedxml = xmldata.toprettyxml()  # prettify xml
+        # fix some prettyxml formatting
         formattedxml = '\n'.join([s for s in formattedxml.splitlines() 
                                   if s.strip()]) # remove double spacing
+        formattedxml = formattedxml.replace("\n<![CDATA", "<![CDATA")
         file.write(formattedxml)
         exit(0)
 
