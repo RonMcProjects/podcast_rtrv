@@ -10,6 +10,7 @@ allargs = ""
 dry_run = False
 indexSubtract = 0
 formatxml = False
+usage = False
 xmldestfile = 'rss.xml'  # target file for RSS XML
 formatted_rssxml = 'formatted_rss.xml'
 default_enclosurename = "rtrvpod_NONAME.txt"
@@ -26,12 +27,27 @@ for i in range(1, len(sys.argv)):
     elif (sys.argv[i] == '--zero') or (sys.argv[i] == '-zero') or (sys.argv[i] == '-z'):
         print("\u2020\u2020 Starting episode numbering at ZERO \u2020\u2020")
         indexSubtract = 1
+    elif (sys.argv[i] == '--help') or (sys.argv[i] == '-help') or (sys.argv[i] == '-h'):
+        usage = True
     elif (sys.argv[i] == '--formatxml') or (sys.argv[i] == '-formatxml'):
         print(f"\u2021\u2021 Output file '{formatted_rssxml}' will be written \u2021\u2021")
         formatxml = True
     else: # accumulate the remaining arguments for passing to wget
         allargs += sys.argv[i] + " "
 
+# If the caller requested usage instructions, print those here
+if usage:
+    print("Usage: rtrvpod.py [arg1] [arg2] ... [argN]")
+    print("")
+    print("Were arguments can be:")
+    print("--dry-run  : Create empty files rather than download audio files.")
+    print("--formatxml: Create a formatted .xml file from ./rss.xml and quit.")
+    print("-h, --help : Print usage instructions.")
+    print("-z, --zero : Start episode numbering at 0 (default 1).")
+    print("")
+    print("Any other options get passed to wget verbatim.")
+
+    exit(0)
 # If the caller requested a formatted xml file, make one and exit
 if formatxml:
     try:
