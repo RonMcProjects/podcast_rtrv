@@ -39,7 +39,7 @@ for i in range(1, len(sys.argv)):
 if usage:
     print("Usage: rtrvpod.py [arg1] [arg2] ... [argN]")
     print("")
-    print("Were arguments can be:")
+    print("Where arguments can be:")
     print("--dry-run  : Create empty files rather than download audio files.")
     print("--formatxml: Create a formatted .xml file from ./rss.xml and quit.")
     print("-h, --help : Print usage instructions.")
