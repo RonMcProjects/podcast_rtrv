@@ -10,6 +10,7 @@ allargs = ""
 dry_run = False
 indexSubtract = 0
 formatxml = False
+numbering = True
 usage = False
 xmldestfile = 'rss.xml'  # target file for RSS XML
 formatted_rssxml = 'formatted_rss.xml'
@@ -32,6 +33,9 @@ for i in range(1, len(sys.argv)):
     elif (sys.argv[i] == '--formatxml') or (sys.argv[i] == '-formatxml'):
         print(f"\u2021\u2021 Output file '{formatted_rssxml}' will be written \u2021\u2021")
         formatxml = True
+    elif (sys.argv[i] == '--nonum') or (sys.argv[i] == '-nonum') or (sys.argv[i] == '-nn'):
+        print("\u2058\u2058 Files will not be numbered \u2058\u2058") 
+        numbering = False
     else: # accumulate the remaining arguments for passing to wget
         allargs += sys.argv[i] + " "
 
@@ -40,10 +44,11 @@ if usage:
     print("Usage: rtrvpod.py [arg1] [arg2] ... [argN]")
     print("")
     print("Where arguments can be:")
-    print("--dry-run  : Create empty files rather than download audio files.")
-    print("--formatxml: Create a formatted .xml file from ./rss.xml and quit.")
-    print("-h, --help : Print usage instructions.")
-    print("-z, --zero : Start episode numbering at 0 (default 1).")
+    print(" --dry-run   : Create empty files rather than download audio files.")
+    print(" --formatxml : Create a formatted .xml file from ./rss.xml and quit.")
+    print(" -h, --help  : Print usage instructions.")
+    print("-nn, --nonum : Don't prefix filenames with a number.")
+    print(" -z, --zero  : Start episode numbering at 0 (default 1).")
     print("")
     print("Any other options get passed to wget verbatim.")
 
@@ -97,7 +102,10 @@ for item in xml_items:  # loop through all <item>s
     # Read the time into a time object.
     dt = datetime.strptime(pubDate, '%a, %d %b %Y %H:%M:%S')
     # Create the file name which is: episode number. episode name - YYYY-MM-DD.ext
-    filename = str(n).zfill(4) + ". " + title + " - " + dt.strftime("%Y-%m-%d") + "." + fileExt
+    if (numbering):
+        filename = str(n).zfill(4) + ". " + title + " - " + dt.strftime("%Y-%m-%d") + "." + fileExt
+    else:
+        filename = dt.strftime("%Y-%m-%d") + " - " + title + "." + fileExt
     # Keep count of the number of the episode, starting at the most recent.
     n -= 1
     if (enclosure != default_enclosurename) and (not dry_run):
