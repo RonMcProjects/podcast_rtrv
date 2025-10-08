@@ -4,7 +4,7 @@ It prompts the user for a web link to a podcast's RSS feed in XML format.
 The utility will fetch the XML file and use it to download all episodes listed therein.
 
 The utility will name the files according to the metadata's **title** and **pubDate**.
-It numbers them from the oldest to the newest.
+It defaults to numbering them from the oldest to the newest, with an option to exclude numbering altogether.
 
 This has been tested on Linux, Cygwin and MacOS.
 It requires *python3*, *touch*, and *wget*.
@@ -25,6 +25,10 @@ rtrvpod.py --zero
 To get the usage instructions, use
 ```bash
 rtrvpod.py --help
+```
+To turn off numbering, in which case the publication date comes first in the filename to provide a sorting order.
+```bash
+rtrvpod.py --nonum
 ```
 Any other command-line arguments get passed directly to *wget*. For example with
 ```bash
