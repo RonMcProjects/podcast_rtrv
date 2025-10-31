@@ -7,6 +7,7 @@ import sys
 
 # Initialize variables
 allargs = ""
+artwork = ""
 dry_run = False
 indexSubtract = 0
 formatxml = False
@@ -79,8 +80,30 @@ subprocess.run(['wget', xmlsrcfile, '-O', xmldestfile])  # get the RSS XML file
 rss_dom = minidom.parse(xmldestfile)  # Use minidom to read the XML file into memory
 xml_items = rss_dom.getElementsByTagName('item')  # all the episode info is under <item> tags
 
+# Get the podcast artwork if available
+try:
+    # The podcast artwork is (usually) under <image>
+    image_items = rss_dom.getElementsByTagName('image')
+    artwork = image_items[0].getElementsByTagName('url')[0].firstChild.nodeValue
+except:
+    try:
+        # If not under <image>, see if there's artwork under <itunes:image>
+        image_items = rss_dom.getElementsByTagName('itunes:image')
+        artwork = image_items[0].getAttribute('href')
+    except:
+        artwork = ""
+
+if artwork != "":
+    # Remove all after the '?' and separate basename from dirname, that's the file name.
+    artwork_file = artwork.rsplit('?')[0].rsplit('/', 1)[1]
+    if (not dry_run):
+        subprocess.run(['wget', artwork, '-O', artwork_file])  # Get the RSS XML file.
+    else:
+        subprocess.run(['touch', artwork_file])  # Create an empty file if in dry-run.
+
+# Loop through all <item>s and get the audio file(s).
 n = len(xml_items) - indexSubtract
-for item in xml_items:  # loop through all <item>s
+for item in xml_items:
     # Retrieve the episode title.  Replace any invalid character with its alternative from
     # the translation table, e.g. '/' to U+2215 because OSes don't like '/' in filenames.
     title = item.getElementsByTagName('title')[0].firstChild.nodeValue.translate(str.maketrans(replace_dict))
@@ -114,6 +137,7 @@ for item in xml_items:  # loop through all <item>s
     else:
         # In case of no attachment or doing a dry-run, create an empty filename.
         subprocess.run(['touch', "-t", dt.strftime("%y%m%d%H%M"), filename])
-    # Write the xml feed URL to a file
-    with open("feedURL.txt", "w") as feedfile:
-        feedfile.write(xmlsrcfile + "\n")
+
+# Write the xml feed URL to a file.
+with open("feedURL.txt", "w") as feedfile:
+    feedfile.write(xmlsrcfile + "\n")

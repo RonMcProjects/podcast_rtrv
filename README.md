@@ -2,6 +2,7 @@
 This is a simple utility for downloading all the episodes of a podcast.
 It prompts the user for a web link to a podcast's RSS feed in XML format.
 The utility will fetch the XML file and use it to download all episodes listed therein.
+It will also fetch the first podcast artwork image it encounters.
 
 The utility will name the files according to the metadata's **title** and **pubDate**.
 It defaults to numbering them from the oldest to the newest, with an option to exclude numbering altogether.
