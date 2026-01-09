@@ -31,6 +31,10 @@ To turn off numbering, in which case the publication date comes first in the fil
 ```bash
 rtrvpod.py --nonum
 ```
+If you pass in the argument ```--html```, every episode description will be saved as an html file alongside the audio file.
+```bash
+rtrvpod.py --html
+```
 Any other command-line arguments get passed directly to *wget*. For example with
 ```bash
 rtrvpod.py --no-clobber -nv

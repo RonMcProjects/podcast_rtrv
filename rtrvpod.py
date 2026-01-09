@@ -13,6 +13,7 @@ indexSubtract = 0
 formatxml = False
 numbering = True
 usage = False
+outputhtml = False
 xmldestfile = 'rss.xml'  # target file for RSS XML
 formatted_rssxml = 'formatted_rss.xml'
 default_enclosurename = "rtrvpod_NONAME.txt"
@@ -20,6 +21,32 @@ replace_dict = {  # Characters to replace in filenames, this list is extendable.
     '/' : '\u2215',
     '\n' : ''
 }
+
+def printhelp():
+    print("Usage: rtrvpod.py [arg1] [arg2] ... [argN]")
+    print("")
+    print("Where arguments can be:")
+    print(" --dry-run   : Create empty files rather than download audio files.")
+    print(" --formatxml : Create a formatted .xml file from ./rss.xml and quit.")
+    print(" -h, --help  : Print usage instructions.")
+    print(" --html      : Save episode description as an html file.")
+    print("-nn, --nonum : Don't prefix filenames with a number.")
+    print(" -z, --zero  : Start episode numbering at 0 (default 1).")
+    print("")
+    print("Any other options get passed to wget verbatim.")
+
+def savehtml(text, savefile, title):
+    html_text = '<html>\n'
+    html_text += '<head>\n<title>\n'
+    html_text += title
+    html_text += '\n</title>\n</head>\n'
+    html_text += '<body>\n'
+    for line in text.split('\n'):
+        html_text += f'<p>{line}</p>\n'
+    html_text += '</body>\n</html>\n'
+    htmlfilename = savefile.rsplit('.', 1)[0] + '.html'
+    with open(htmlfilename, "w") as htmlfile:
+        htmlfile.write(html_text)
 
 # Parse arguments.
 for i in range(1, len(sys.argv)):
@@ -35,25 +62,19 @@ for i in range(1, len(sys.argv)):
         print(f"\u2021\u2021 Output file '{formatted_rssxml}' will be written \u2021\u2021")
         formatxml = True
     elif (sys.argv[i] == '--nonum') or (sys.argv[i] == '-nonum') or (sys.argv[i] == '-nn'):
-        print("\u2058\u2058 Files will not be numbered \u2058\u2058") 
+        print("== Files will not be numbered ==")
         numbering = False
+    elif (sys.argv[i] == '--html') or (sys.argv[i] == '-html'):
+        print("-- Descriptions will be saved to html files --")
+        outputhtml = True
     else: # accumulate the remaining arguments for passing to wget
         allargs += sys.argv[i] + " "
 
 # If the caller requested usage instructions, print those here
 if usage:
-    print("Usage: rtrvpod.py [arg1] [arg2] ... [argN]")
-    print("")
-    print("Where arguments can be:")
-    print(" --dry-run   : Create empty files rather than download audio files.")
-    print(" --formatxml : Create a formatted .xml file from ./rss.xml and quit.")
-    print(" -h, --help  : Print usage instructions.")
-    print("-nn, --nonum : Don't prefix filenames with a number.")
-    print(" -z, --zero  : Start episode numbering at 0 (default 1).")
-    print("")
-    print("Any other options get passed to wget verbatim.")
-
+    printhelp()
     exit(0)
+
 # If the caller requested a formatted xml file, make one and exit
 if formatxml:
     try:
@@ -129,6 +150,10 @@ for item in xml_items:
         filename = str(n).zfill(4) + ". " + title + " - " + dt.strftime("%Y-%m-%d") + "." + fileExt
     else:
         filename = dt.strftime("%Y-%m-%d") + " - " + title + "." + fileExt
+    try:
+        description = item.getElementsByTagName('description')[0].firstChild.nodeValue
+    except:
+        outputhtml = False
     # Keep count of the number of the episode, starting at the most recent.
     n -= 1
     if (enclosure != default_enclosurename) and (not dry_run):
@@ -137,6 +162,8 @@ for item in xml_items:
     else:
         # In case of no attachment or doing a dry-run, create an empty filename.
         subprocess.run(['touch', "-t", dt.strftime("%y%m%d%H%M"), filename])
+    if outputhtml:
+        savehtml(str(description), filename, title)
 
 # Write the xml feed URL to a file.
 with open("feedURL.txt", "w") as feedfile:
