@@ -153,7 +153,7 @@ for item in xml_items:
     try:
         description = item.getElementsByTagName('description')[0].firstChild.nodeValue
     except:
-        outputhtml = False
+        description = 'No description'
     # Keep count of the number of the episode, starting at the most recent.
     n -= 1
     if (enclosure != default_enclosurename) and (not dry_run):
