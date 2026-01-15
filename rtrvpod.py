@@ -122,6 +122,10 @@ if artwork != "":
     else:
         subprocess.run(['touch', artwork_file])  # Create an empty file if in dry-run.
 
+# Write the xml feed URL to a file.
+with open("feedURL.txt", "w") as feedfile:
+    feedfile.write(xmlsrcfile + "\n")
+
 # Loop through all <item>s and get the audio file(s).
 n = len(xml_items) - indexSubtract
 for item in xml_items:
@@ -164,7 +168,3 @@ for item in xml_items:
         subprocess.run(['touch', "-t", dt.strftime("%y%m%d%H%M"), filename])
     if outputhtml:
         savehtml(str(description), filename, title)
-
-# Write the xml feed URL to a file.
-with open("feedURL.txt", "w") as feedfile:
-    feedfile.write(xmlsrcfile + "\n")
