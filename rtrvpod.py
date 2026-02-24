@@ -4,6 +4,7 @@ from xml.dom import minidom
 from datetime import datetime
 import subprocess
 import sys
+import os
 
 # Initialize variables
 allargs = ""
@@ -45,7 +46,11 @@ def savehtml(text, savefile, title):
         html_text += f'<p>{line}</p>\n'
     html_text += '</body>\n</html>\n'
     htmlfilename = savefile.rsplit('.', 1)[0] + '.html'
-    with open(htmlfilename, "w") as htmlfile:
+    try:
+        os.mkdir("html")
+    except Exception:
+        pass
+    with open(os.path.join("html", htmlfilename), "w") as htmlfile:
         htmlfile.write(html_text)
 
 # Parse arguments.
@@ -96,7 +101,7 @@ if not bool(xmlsrcfile):
     xmlsrcfile = 'planetjarre.podigee.io/feed/mp3'  # default RSS file if none is given
     print("***\n*** No value entered, using " + xmlsrcfile + "\n***")
 
-subprocess.run(['wget', xmlsrcfile, '-O', xmldestfile])  # get the RSS XML file
+subprocess.run(['wget', '--no-check-certificate', xmlsrcfile, '-O', xmldestfile])  # get the RSS XML file
 
 rss_dom = minidom.parse(xmldestfile)  # Use minidom to read the XML file into memory
 xml_items = rss_dom.getElementsByTagName('item')  # all the episode info is under <item> tags
@@ -118,7 +123,7 @@ if artwork != "":
     # Remove all after the '?' and separate basename from dirname, that's the file name.
     artwork_file = artwork.rsplit('?')[0].rsplit('/', 1)[1]
     if (not dry_run):
-        subprocess.run(['wget', artwork, '-O', artwork_file])  # Get the RSS XML file.
+        subprocess.run(['wget', '--no-check-certificate', artwork, '-O', artwork_file])  # Get the RSS XML file.
     else:
         subprocess.run(['touch', artwork_file])  # Create an empty file if in dry-run.
 
@@ -162,7 +167,7 @@ for item in xml_items:
     n -= 1
     if (enclosure != default_enclosurename) and (not dry_run):
         # Download the episode, renaming it in the process.
-        subprocess.run(['wget', *allargs.split(), enclosure, '-O', filename])
+        subprocess.run(['wget', '--no-check-certificate', *allargs.split(), enclosure, '-O', filename])
     else:
         # In case of no attachment or doing a dry-run, create an empty filename.
         subprocess.run(['touch', "-t", dt.strftime("%y%m%d%H%M"), filename])

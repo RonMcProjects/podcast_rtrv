@@ -31,7 +31,7 @@ To turn off numbering, in which case the publication date comes first in the fil
 ```bash
 rtrvpod.py --nonum
 ```
-If you pass in the argument ```--html```, every episode description will be saved as an html file alongside the audio file.
+If you pass in the argument ```--html```, every episode description will be saved as an html file in subdirectory ```html/```.
 ```bash
 rtrvpod.py --html
 ```
